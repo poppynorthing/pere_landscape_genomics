@@ -21,7 +21,7 @@ RAW=sequences/raw
 TRIMDIR=sequences/trimmed
 FASTPDIR=sequences/trimmed/fastp_report
 
-#Trim sequence reads
+# Trim sequence reads
 
 fastp -i $RAW/"$file"_R1_001.fastq.gz -I $RAW/"$file"_R2_001.fastq.gz -o $TRIMDIR/"$file"_R1_001.fastq.gz -O $TRIMDIR/"$file"_R2_001.fastq.gz \
 --adapter_sequence AGATCGGAAGAGCACACGTCTGAACTCCAGTCA \
@@ -51,14 +51,14 @@ GENOME=/xdisk/kdlugosch/pcnorthing/Genome/pere_ch.fa
 TRIMDIR=sequences/trimmed
 ALIGNDIR=sequences/aligned
 
-#Align trimmed reads to PERE reference genome
+# Align trimmed reads to PERE reference genome
 
 bwa mem -t 16 $GENOME $TRIMDIR/"$file"_R1_merged.fastq.gz $TRIMDIR/"$file"_R2_merged.fastq.gz > $ALIGNDIR/"$file".sam
 samtools view -bS $ALIGNDIR/"$file".sam > $ALIGNDIR/"$file".bam
 samtools sort $ALIGNDIR/"$file".bam -o $ALIGNDIR/"$file".bam
 rm $ALIGNDIR/"$file".sam
 
-# Run samtools flagstat
+# Generate read mapping statistics
 reads=`samtools flagstat $ALIGNDIR/"$file".bam -@ 24 | grep total | cut -f 1 -d' '`
 mapped=`samtools flagstat $ALIGNDIR/"$file".bam -@ 24 | grep mapped | head -n 1 | cut -f 1 -d' '`
 echo "${file},${reads},${mapped}" >> mapping_stats.csv
