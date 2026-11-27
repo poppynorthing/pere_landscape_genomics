@@ -11,7 +11,7 @@ First, we calculated mean depth for each sample across the genome using [mosdept
 #SBATCH --nodes=1
 #SBATCH --mem-per-cpu=4gb
 #SBATCH --cpus-per-task=16
-#SBATCH --time=6:00:00
+#SBATCH --time=1:00:00
 #SBATCH --array=1-28%14
 
 file=$(cat ./file_lists/samples.txt | sed -n ${SLURM_ARRAY_TASK_ID}p)
