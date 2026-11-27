@@ -23,7 +23,9 @@ micromamba activate grenedalf
 ALIGNDIR=sequences/aligned/dedup
 
 # Calculate depth 
-for bam in $ALIGNDIR/*.bam; do mosdepth -t 8 -n "$file" "$bam"; done
+do mosdepth -t 8 -n "$file" "$file".dedup.bam
+
+# Summarize
 grep total *.mosdepth.summary.txt >> depth.txt
 ```
 
