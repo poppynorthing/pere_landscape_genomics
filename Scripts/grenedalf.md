@@ -28,13 +28,33 @@ do mosdepth -t 8 -n "$file" "$file".dedup.bam
 # Summarize
 grep total *.mosdepth.summary.txt >> depth.txt
 ```
+### Creating sync file
+
+```
+#!/bin/bash
+
+#SBATCH --ntasks=1
+#SBATCH --nodes=1
+#SBATCH --mem-per-cpu=4gb
+#SBATCH --cpus-per-task=16
+#SBATCH --time=12:00:00
+
+export MAMBA_ROOT_PREFIX=/home/u5/pcnorthing/micromamba
+eval "$(/opt/ohpc/pub/apps/micromamba/2.0.2-2/bin/micromamba shell hook --shell bash)"
+micromamba activate grenedalf
+
+BAMS=sequences/aligned/dedup
+
+grenedalf sync \
+  --sam-path $BAMS \
+  --sam-min-map-qual 20 \
+  --sam-min-base-qual 20 \
+  --out-dir sequences/sync_out \
+  --file-prefix pools_ \
+  --threads 8
+```
 
 ### Calculating allele frequencies per locus in each pool
-
-```
-```
-
-### Creating sync file for further analyses
 
 ```
 ```
