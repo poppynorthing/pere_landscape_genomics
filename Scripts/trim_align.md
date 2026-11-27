@@ -30,7 +30,7 @@ fastp -i $RAW/"$file"_R1_001.fastq.gz -I $RAW/"$file"_R2_001.fastq.gz -o $TRIMDI
 ```
 
 ### Alignment
-Trimmed reads were aligned to the chromosome contigs from the [<i>Pectocarya recurvata</i> reference genome](https://bsapubs.onlinelibrary.wiley.com/doi/10.1002/aps3.70008) (Northing et al. 2025) using [BWA](https://github.com/lh3/bwa) mem v0.7.18 (Li 2013) with default settings.
+Trimmed reads were aligned to the chromosome contigs from the [<i>Pectocarya recurvata</i> reference genome](https://bsapubs.onlinelibrary.wiley.com/doi/10.1002/aps3.70008) (Northing et al. 2025) using [BWA](https://github.com/lh3/bwa) mem v0.7.18 (Li 2013) with default settings. Alignment metrics were generated using [samtools](https://doi.org/10.1093/bioinformatics/btp352) v1.19.2 'flagstat' (Li et al. 2009).
 
 ```
  #!/bin/bash
@@ -64,29 +64,34 @@ mapped=`samtools flagstat $ALIGNDIR/"$file".bam -@ 24 | grep mapped | head -n 1 
 echo "${file},${reads},${mapped}" >> mapping_stats.csv
 ```
 
-### Mark Duplicate Reads
-PCR and optical duplicates were removed using [picard](https://github.com/broadinstitute/picard) v2.23.4 (Picard Toolkit 2019). Make sure that picard has enough memory; I had to set mem-per-cpu to 16
-to get this to run.
+### Duplicate Reads
+Duplicate reads were identified and removed using [samtools](https://doi.org/10.1093/bioinformatics/btp352) v1.19.2 'markdup' (Li et al. 2009).
 
 ```
 #!/bin/bash
 
 #SBATCH --ntasks=1
 #SBATCH --nodes=1
-#SBATCH --mem-per-cpu=16gb
-#SBATCH --cpus-per-task=2
-#SBATCH --time=1-00:00:00
-#SBATCH --array=1-28%28
+#SBATCH --mem-per-cpu=4gb
+#SBATCH --cpus-per-task=16
+#SBATCH --time=10:00:00
+#SBATCH --array=1-28%14
 
-file=$(cat ./file_lists/sample_ids.txt | sed -n ${SLURM_ARRAY_TASK_ID}p)
+file=$(cat ./file_lists/samples.txt | sed -n ${SLURM_ARRAY_TASK_ID}p)
 
-ml picard
+ml samtools
+ALIGNDIR=sequences/aligned
 
-BAMDIR=sequences/aligned
+# Mark duplicates with samtools
 
-# Mark duplicates (pcr + optical) w/ picard
+samtools sort -n -@ 8 -o $ALIGNDIR/"$file".name.bam $ALIGNDIR/"$file".bam
+samtools fixmate -m -@ 8 $ALIGNDIR/"$file".name.bam $ALIGNDIR/"$file".fixmate.bam
+samtools sort -@ 8 -o $ALIGNDIR/"$file".possort.bam $ALIGNDIR/"$file".fixmate.bam
+samtools markdup -r -@ 8 -f $ALIGNDIR/"$file".markdup_stats.txt \
+    $ALIGNDIR/"$file".possort.bam $ALIGNDIR/"$file".dedup.bam
+samtools index $ALIGNDIR/"$file".dedup.bam
 
-picard MarkDuplicates I=$BAMDIR/"$file"_merged.rg.bam O=$BAMDIR/"$file".markedDups.bam M="$file".dupMetrics.txt
+rm $ALIGNDIR/"$file".name.bam $ALIGNDIR/"$file".fixmate.bam $ALIGNDIR/"$file".possort.bam
 
 ```
 
