@@ -47,6 +47,7 @@ BAMS=sequences/aligned/dedup
 
 grenedalf sync \
   --sam-path $BAMS \
+  --reference-genome-fasta $REF \
   --sam-min-map-qual 20 \
   --sam-min-base-qual 20 \
   --out-dir sequences/sync_out \
