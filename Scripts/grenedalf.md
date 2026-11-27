@@ -1,8 +1,8 @@
 # Processing poolseq samples using Grenedalf
 
-We used [grenedalf](https://github.com/lczech/grenedalf) v0.6.3 to handle our poolseq analyses. We used our filtered and indexed bam files (see [trim_align.md](https://github.com/poppynorthing/pere_landscape_genomics/blob/main/Scripts/trim_align.md)) as our input.
+We used [grenedalf](https://doi.org/10.1093/bioinformatics/btae508) v0.6.3 to handle our poolseq analyses (Czech et al. 2024). We used our filtered and indexed bam files (see [trim_align.md](https://github.com/poppynorthing/pere_landscape_genomics/blob/main/Scripts/trim_align.md)) as our input.
 
-First, we calculated mean depth per x using mosdepth vx (ref).
+First, we calculated mean depth for each sample across the genome using [mosdepth](https://doi.org/10.1093/bioinformatics/btx699) v0.3.14 (Pederson and Quinlan 2017).
 
 ```
 #!/bin/bash
@@ -46,3 +46,9 @@ grep total *.mosdepth.summary.txt >> depth.txt
 
 ```
 ```
+
+### References
+
+Brent S Pedersen, Aaron R Quinlan, Mosdepth: quick coverage calculation for genomes and exomes, Bioinformatics, Volume 34, Issue 5, March 2018, Pages 867–868, https://doi.org/10.1093/bioinformatics/btx699
+
+Lucas Czech, Jeffrey P Spence, Moisés Expósito-Alonso, grenedalf: population genetic statistics for the next generation of pool sequencing, Bioinformatics, Volume 40, Issue 8, August 2024, btae508, https://doi.org/10.1093/bioinformatics/btae508
